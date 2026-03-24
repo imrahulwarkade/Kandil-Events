@@ -42,7 +42,7 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
-        <Marquee />
+        {/* <Marquee /> */}
         <About />
         <Services />
         <Gallery />
