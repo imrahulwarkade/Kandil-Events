@@ -18,6 +18,8 @@ export type Service = {
   icon: string;
   name: string;
   description: string;
+  image: string;
+  badge: string;
 };
 
 export type Testimonial = {

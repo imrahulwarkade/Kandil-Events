@@ -1,118 +1,150 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SectionLabel } from "@/src/components/SectionLabel";
 import { services } from "@/src/lib/data";
 import type { Service } from "@/src/types";
 
-const MotionLink = motion.create(Link);
+gsap.registerPlugin(ScrollTrigger);
 
-const viewport = { once: true, amount: 0.12 as const };
-
-const delays = [0, 0.1, 0.2, 0.3];
-
-function ServiceCard({ service, index }: { service: Service; index: number }) {
+function ServiceCard({ service }: { service: Service }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={viewport}
-      transition={{
-        duration: 0.8,
-        delay: delays[index] ?? 0,
-        ease: "easeOut",
-      }}
-    >
-      <motion.article
-        className="relative overflow-hidden bg-mocha p-14 px-10"
-        initial="rest"
-        whileHover="hover"
-        variants={{ rest: {}, hover: {} }}
-      >
-        <motion.div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-gold/10 to-transparent"
-          variants={{
-            rest: { opacity: 0 },
-            hover: { opacity: 1 },
-          }}
-          transition={{ duration: 0.4 }}
+    <div className="flex min-w-[320px] flex-col overflow-hidden rounded-3xl bg-[#f0f9f6] md:min-w-100">
+      {/* Image Container */}
+      <div className="relative aspect-4/2 w-full overflow-hidden">
+        <img
+          src={service.image}
+          alt={service.name}
+          className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
         />
-        <motion.div
-          className="pointer-events-none absolute inset-0 bg-mocha/50"
-          variants={{
-            rest: { opacity: 0 },
-            hover: { opacity: 1 },
-          }}
-          transition={{ duration: 0.4 }}
-        />
-        <div className="relative z-[2]">
-          <span className="absolute right-8 top-8 font-serif text-sm tracking-[0.15em] text-gold/30">
-            {service.num}
+        {/* Badge on Image */}
+        <div className="absolute bottom-4 left-4">
+          <span className="rounded-full bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-dark/80">
+            {service.badge}
           </span>
-          <span className="mb-8 block text-4xl">{service.icon}</span>
-          <h3 className="mb-4 font-serif text-[28px] font-light leading-tight text-cream">
-            {service.name}
-          </h3>
-          <p className="mb-8 text-[13px] font-light leading-[1.8] text-cream/50">
-            {service.description}
-          </p>
-          <MotionLink
-            href="/#contact"
-            className="relative inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-gold no-underline focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
-            initial="rest"
-            whileHover="hover"
-            variants={{ rest: {}, hover: {} }}
-          >
-            Enquire
-            <motion.span
-              variants={{
-                rest: { x: 0 },
-                hover: { x: 4 },
-              }}
-              transition={{ duration: 0.3 }}
-            >
-              →
-            </motion.span>
-          </MotionLink>
         </div>
-      </motion.article>
-    </motion.div>
+      </div>
+
+      {/* Content Area */}
+      <div className="relative flex flex-1 flex-col p-4 pb-10">
+        <h3 className="mb-4 font-serif text-[24px] font-bold leading-tight text-dark md:text-[28px]">
+          {service.name}
+        </h3>
+        <p className="mb-8 text-[14px] leading-[1.6] text-dark/70">
+          {service.description}
+        </p>
+
+        {/* Circular Arrow Button */}
+        <Link
+          href="/#contact"
+          className="absolute bottom-10 right-8 flex h-12 w-12 items-center justify-center rounded-full bg-[#0a4d3f] text-white transition-transform hover:scale-110"
+        >
+          <span className="text-xl -rotate-45">→</span>
+        </Link>
+      </div>
+    </div>
   );
 }
 
 export function Services() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const section = sectionRef.current;
+      const scrollContainer = scrollRef.current;
+
+      if (!section || !scrollContainer) return;
+
+      const mm = gsap.matchMedia();
+
+      mm.add("(min-width: 1024px)", () => {
+        const totalWidth = scrollContainer.scrollWidth;
+        const windowWidth = window.innerWidth;
+        const scrollAmount = totalWidth - windowWidth + 200;
+
+        gsap.to(scrollContainer, {
+          x: -scrollAmount,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            pin: true,
+            scrub: 1,
+            start: "top 80px", // Offset for fixed navbar
+            end: () => `+=${scrollAmount}`,
+            invalidateOnRefresh: true,
+          },
+        });
+      });
+
+      mm.add("(max-width: 1023px)", () => {
+        gsap.from(".service-card-mobile", {
+          opacity: 0,
+          y: 50,
+          stagger: 0.2,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 80%",
+          },
+        });
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       id="services"
-      className="bg-mocha px-[60px] py-[120px]"
-      aria-labelledby="services-heading"
+      className="relative overflow-hidden bg-cream px-[5%] md:px-[7%]  pb-20  lg:pb-20"
     >
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={viewport}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-      >
-        <SectionLabel className="text-gold">What We Offer</SectionLabel>
-      </motion.div>
-      <motion.h2
-        id="services-heading"
-        className="mb-0 font-serif text-[clamp(42px,5vw,68px)] font-light leading-[1.1] text-cream"
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={viewport}
-        transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-      >
-        Our <em className="italic text-rose">Signature</em>
-        <br />
-        Services
-      </motion.h2>
+      <div className="container-custom">
+        <div className="mb-10 flex flex-col items-start justify-between gap-8 lg:mb-16 lg:flex-row lg:items-end">
+          <div className="max-w-2xl">
+            <span className="mb-4 inline-block rounded-full border border-dark/20 px-6 py-2 text-[11px] font-bold uppercase tracking-widest text-dark">
+              Our Services
+            </span>
+            <h2 className="font-serif text-[clamp(40px,6vw,72px)] font-bold leading-none text-dark">
+              Bespoke Event <br /> Experiences
+            </h2>
+          </div>
+          
+          {/* Decorative Dot */}
+          <div className="relative mb-4 hidden h-3 w-3 rounded-full bg-blush opacity-50 lg:block lg:mb-6" />
 
-      <div className="mt-20 grid grid-cols-1 gap-px bg-gold/20 sm:grid-cols-2 lg:grid-cols-4">
-        {services.map((service, index) => (
-          <ServiceCard key={service.num} service={service} index={index} />
-        ))}
+          <div className="max-w-md">
+            <p className="max-w-prose text-base leading-relaxed text-dark/70 lg:text-lg">
+              From intimate nikah ceremonies to grand corporate galas—we craft
+              events that reflect your unique story with timeless elegance and
+              contemporary luxury.
+            </p>
+          </div>
+        </div>
+
+        {/* Desktop Horizontal Scroll */}
+        <div className="hidden lg:block">
+          <div ref={scrollRef} className="flex gap-8 px-8">
+            {services.map((service) => (
+              <ServiceCard key={service.num} service={service} />
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile Vertical Stack */}
+        <div className="flex flex-col gap-8 px-4 lg:hidden">
+          {services.map((service) => (
+            <div key={service.num} className="service-card-mobile">
+              <ServiceCard service={service} />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

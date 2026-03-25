@@ -85,7 +85,7 @@ export function About() {
   return (
     <section
       id="about"
-      className="px-[60px] py-[120px]"
+      className="px-[5%] md:px-[7%] py-[120px]"
       aria-labelledby="about-heading"
     >
       <div className="grid grid-cols-1 items-center gap-[100px] lg:grid-cols-2">

@@ -29,6 +29,8 @@ export const services: Service[] = [
     name: "Weddings & Ceremonies",
     description:
       "From intimate nikah ceremonies to grand ballroom receptions, we craft weddings that reflect your unique love story with timeless elegance.",
+    image: "/assets/wedding_service_placeholder_1774394639013.png",
+    badge: "LEARNING & OPPORTUNITY", // Using image labels as reference
   },
   {
     num: "02",
@@ -36,6 +38,8 @@ export const services: Service[] = [
     name: "Corporate Galas",
     description:
       "Award nights, product launches, and executive retreats — delivered with impeccable professionalism and sophisticated design.",
+    image: "/assets/corporate_gala_placeholder_1774394706885.png",
+    badge: "YOUTH EMPOWERMENT",
   },
   {
     num: "03",
@@ -43,6 +47,8 @@ export const services: Service[] = [
     name: "Birthdays & Milestones",
     description:
       "Celebrate every chapter in style. Milestone birthdays and anniversaries curated with personal touches that make moments unforgettable.",
+    image: "/assets/birthday_celebration_placeholder_1774394721550.png",
+    badge: "SKILLS EMPOWERMENT",
   },
   {
     num: "04",
@@ -50,6 +56,8 @@ export const services: Service[] = [
     name: "Cultural & Religious",
     description:
       "Deeply rooted in tradition, our cultural event services honor heritage with reverence while weaving in contemporary luxury aesthetics.",
+    image: "/assets/cultural_event_placeholder_1774394813361.png",
+    badge: "HEALTH & WELL-BEING",
   },
 ];
 
