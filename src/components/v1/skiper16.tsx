@@ -36,7 +36,7 @@ export const StickyCard_001 = ({
           scale,
           top: `calc(-5vh + ${i * 40}px)`,
         }}
-        className="relative h-[280px] md:h-[450px] w-full max-w-[1000px] overflow-hidden rounded-3xl bg-mocha shadow-2xl"
+        className="relative h-70 md:h-112.5 w-full max-w-250 overflow-hidden rounded-3xl bg-mocha shadow-2xl"
       >
         <div className="absolute inset-0 h-full w-full">
           <Image

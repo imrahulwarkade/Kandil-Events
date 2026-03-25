@@ -1,13 +1,35 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SectionLabel } from "@/src/components/SectionLabel";
 import { eventTypeOptions } from "@/src/lib/data";
 import type { ContactFormValues } from "@/src/types";
+import { Mail, Phone, MapPin, ArrowRight } from "lucide-react";
 
-const viewport = { once: true, amount: 0.12 as const };
+const Instagram = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
+
+gsap.registerPlugin(ScrollTrigger);
 
 const initial: ContactFormValues = {
   name: "",
@@ -19,9 +41,74 @@ const initial: ContactFormValues = {
 
 export function Contact() {
   const [values, setValues] = useState<ContactFormValues>(initial);
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
-    "idle",
-  );
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const infoRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    // Refresh ScrollTrigger to account for dynamic content above (Gallery, etc.)
+    const timer = setTimeout(() => ScrollTrigger.refresh(), 1000);
+
+    const ctx = gsap.context(() => {
+      // Entrance Animation
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "bottom bottom",
+          scrub: 1.5,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      // Left Column Reveal (Text titles reveal from -100% left)
+      tl.from(".contact-reveal-left", {
+        x: -200,
+        opacity: 0,
+        duration: 2,
+        stagger: 0.5,
+        ease: "power2.out",
+      });
+
+      // Right Column Reveal (Form reveals from the right)
+      tl.from(".contact-reveal-right", {
+        x: 200,
+        opacity: 0,
+        duration: 2,
+        ease: "power2.out",
+      }, "<0.5");
+
+      // Magnetic Button Effect
+      const button = buttonRef.current;
+      if (button) {
+        const onMouseMove = (e: MouseEvent) => {
+          const { clientX, clientY } = e;
+          const { left, top, width, height } = button.getBoundingClientRect();
+          const x = clientX - (left + width / 2);
+          const y = clientY - (top + height / 2);
+          gsap.to(button, {
+            x: x * 0.2,
+            y: y * 0.2,
+            duration: 0.4,
+            ease: "power2.out",
+          });
+        };
+        const onMouseLeave = () => {
+          gsap.to(button, { x: 0, y: 0, duration: 0.6, ease: "elastic.out(1, 0.3)" });
+        };
+        button.addEventListener("mousemove", onMouseMove);
+        button.addEventListener("mouseleave", onMouseLeave);
+        return () => {
+          button.removeEventListener("mousemove", onMouseMove);
+          button.removeEventListener("mouseleave", onMouseLeave);
+        };
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const update =
     (field: keyof ContactFormValues) =>
@@ -41,236 +128,216 @@ export function Contact() {
       if (!res.ok) throw new Error("Request failed");
       setStatus("success");
       setValues(initial);
+      setTimeout(() => setStatus("idle"), 5000);
     } catch {
       setStatus("error");
+      setTimeout(() => setStatus("idle"), 5000);
     }
   }
 
   return (
     <section
       id="contact"
-      className="bg-mocha px-[60px] py-[120px] text-cream"
+      ref={sectionRef}
+      className="bg-mocha px-[5%] py-24 md:px-[7%] lg:py-32 overflow-hidden"
       aria-labelledby="contact-heading"
     >
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={viewport}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-      >
-        <SectionLabel className="text-gold">Let&apos;s Connect</SectionLabel>
-      </motion.div>
-      <motion.h2
-        id="contact-heading"
-        className="mb-20 font-serif text-[clamp(42px,5vw,68px)] font-light leading-[1.1] text-cream"
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={viewport}
-        transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-      >
-        Begin Your
-        <br />
-        <em className="italic text-rose">Story</em> With Us
-      </motion.h2>
-
-      <div className="grid grid-cols-1 items-start gap-[100px] lg:grid-cols-2">
-        <div>
-          <motion.div
-            className="border-t border-gold/30 py-10 first:border-t-0 first:pt-0"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={viewport}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+      <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:gap-24">
+        {/* Left Column: Info */}
+        <div ref={infoRef} className="flex flex-col justify-center">
+          <SectionLabel className="mb-8 text-gold border-gold/20 contact-reveal-left">Let&apos;s Connect</SectionLabel>
+          <h2
+            id="contact-heading"
+            className="mb-12 font-serif text-[clamp(42px,6vw,84px)] font-bold leading-[1.05] text-cream contact-reveal-left"
           >
-            <div className="mb-3 text-[10px] uppercase tracking-[0.25em] text-gold">
-              Email
-            </div>
-            <div className="font-serif text-[26px] font-light">
-              <Link
-                href="mailto:kandil.claykala@gmail.com"
-                className="text-cream no-underline focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
-              >
-                kandil.claykala@gmail.com
-              </Link>
-            </div>
-          </motion.div>
-          <motion.div
-            className="border-t border-gold/30 py-10"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={viewport}
-            transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-          >
-            <div className="mb-3 text-[10px] uppercase tracking-[0.25em] text-gold">
-              Phone
-            </div>
-            <div className="font-serif text-[26px] font-light">
-              <Link
-                href="tel:+918088258050"
-                className="text-cream no-underline focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
-              >
-                +91 80882 58050
-              </Link>
-            </div>
-          </motion.div>
-          <motion.div
-            className="border-t border-gold/30 py-10"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={viewport}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          >
-            <div className="mb-3 text-[10px] uppercase tracking-[0.25em] text-gold">
-              Based In
-            </div>
-            <div className="font-serif text-[26px] font-light text-cream">
-              Bhopal, India
-            </div>
-          </motion.div>
-          <motion.div
-            className="border-t border-gold/30 py-10"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={viewport}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-          >
-            <div className="mb-3 text-[10px] uppercase tracking-[0.25em] text-gold">
-              Follow Us
-            </div>
-            <div className="font-serif text-[26px] font-light">
-              <Link
-                href="https://instagram.com/kandil.events"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-cream no-underline focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
-              >
-                @kandil.events
-              </Link>
-            </div>
-          </motion.div>
+            Start Your <br />
+            <em className="italic text-gold">Celebration</em>
+          </h2>
+          
+          <div className="space-y-8 contact-reveal-left">
+            <ContactLink
+              icon={<Mail className="w-5 h-5" />}
+              label="Email"
+              href="mailto:kandil.claykala@gmail.com"
+              value="kandil.claykala@gmail.com"
+            />
+            <ContactLink
+              icon={<Phone className="w-5 h-5" />}
+              label="Phone"
+              href="tel:+918088258050"
+              value="+91 80882 58050"
+            />
+            <ContactItem
+              icon={<MapPin className="w-5 h-5" />}
+              label="Location"
+              value="Bhopal, India"
+            />
+            <ContactLink
+              icon={<Instagram className="w-5 h-5" />}
+              label="Instagram"
+              href="https://instagram.com/kandil.events"
+              value="@kandil.events"
+            />
+          </div>
         </div>
 
-        <motion.form
-          className="flex flex-col gap-6"
-          onSubmit={onSubmit}
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={viewport}
-          transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-        >
-          <div className="flex flex-col gap-2">
-            <label htmlFor="contact-name" className="text-[10px] font-light uppercase tracking-[0.2em] text-cream/50">
-              Your Name
-            </label>
-            <input
-              id="contact-name"
-              name="name"
-              type="text"
-              autoComplete="name"
-              placeholder="Full name"
-              value={values.name}
-              onChange={update("name")}
-              className="border-0 border-b border-gold/40 bg-transparent py-4 font-sans text-[15px] font-light text-cream outline-none placeholder:text-cream/25 focus:border-gold"
-              required
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="contact-email" className="text-[10px] font-light uppercase tracking-[0.2em] text-cream/50">
-              Email Address
-            </label>
-            <input
-              id="contact-email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="your@email.com"
-              value={values.email}
-              onChange={update("email")}
-              className="border-0 border-b border-gold/40 bg-transparent py-4 font-sans text-[15px] font-light text-cream outline-none placeholder:text-cream/25 focus:border-gold"
-              required
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="contact-event-type" className="text-[10px] font-light uppercase tracking-[0.2em] text-cream/50">
-              Event Type
-            </label>
-            <select
-              id="contact-event-type"
-              name="eventType"
-              value={values.eventType}
-              onChange={update("eventType")}
-              className="cursor-pointer appearance-none border-0 border-b border-gold/40 bg-transparent py-4 font-sans text-[15px] font-light text-cream outline-none focus:border-gold"
-            >
-              <option value="">Select event type</option>
-              {eventTypeOptions.map((opt) => (
-                <option key={opt} value={opt} className="bg-mocha">
-                  {opt}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="contact-date" className="text-[10px] font-light uppercase tracking-[0.2em] text-cream/50">
-              Event Date
-            </label>
-            <input
-              id="contact-date"
-              name="eventDate"
-              type="text"
-              placeholder="Approximate date"
-              value={values.eventDate}
-              onChange={update("eventDate")}
-              className="border-0 border-b border-gold/40 bg-transparent py-4 font-sans text-[15px] font-light text-cream outline-none placeholder:text-cream/25 focus:border-gold"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="contact-message" className="text-[10px] font-light uppercase tracking-[0.2em] text-cream/50">
-              Tell Us About Your Vision
-            </label>
-            <textarea
-              id="contact-message"
-              name="message"
-              rows={4}
-              placeholder="Describe your dream event..."
-              value={values.message}
-              onChange={update("message")}
-              className="h-[100px] resize-none border-0 border-b border-gold/40 bg-transparent py-4 font-sans text-[15px] font-light text-cream outline-none placeholder:text-cream/25 focus:border-gold"
-            />
-          </div>
-
-          <motion.button
-            type="submit"
-            disabled={status === "loading"}
-            className="relative mt-4 inline-flex max-w-max overflow-hidden border-0 bg-gold px-12 py-5 font-sans text-[11px] font-normal uppercase tracking-[0.25em] text-mocha focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cream disabled:opacity-60"
-            whileHover="hover"
-            initial="rest"
-            variants={{ rest: {}, hover: {} }}
+        {/* Right Column: Form */}
+        <div className="relative">
+          <motion.div 
+            className="rounded-3xl border border-gold/10 bg-cream/5 p-8 md:p-12 backdrop-blur-md contact-reveal-right"
           >
-            <motion.span
-              className="absolute inset-0 bg-cream"
-              variants={{
-                rest: { x: "-101%" },
-                hover: { x: 0 },
-              }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-            />
-            <span className="relative z-10">
-              {status === "loading" ? "Sending…" : "Send Enquiry"}
-            </span>
-          </motion.button>
+            <form ref={formRef} className="flex flex-col gap-6" onSubmit={onSubmit}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FloatingInput
+                  id="name"
+                  label="Name"
+                  value={values.name}
+                  onChange={update("name")}
+                  required
+                />
+                <FloatingInput
+                  id="email"
+                  label="Email"
+                  type="email"
+                  value={values.email}
+                  onChange={update("email")}
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gold/60">
+                    Event Type
+                  </label>
+                  <select
+                    value={values.eventType}
+                    onChange={update("eventType")}
+                    className="bg-transparent border-b border-gold/20 py-3 text-cream outline-none focus:border-gold transition-colors font-light appearance-none"
+                    required
+                  >
+                    <option value="" className="bg-mocha">How can we help?</option>
+                    {eventTypeOptions.map((opt) => (
+                      <option key={opt} value={opt} className="bg-mocha">{opt}</option>
+                    ))}
+                  </select>
+                </div>
+                <FloatingInput
+                  id="date"
+                  label="Event Date"
+                  placeholder="e.g. Oct 2024"
+                  value={values.eventDate}
+                  onChange={update("eventDate")}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gold/60">
+                  Your Vision
+                </label>
+                <textarea
+                  rows={4}
+                  value={values.message}
+                  onChange={update("message")}
+                  placeholder="Tell us about the dream event you're planning..."
+                  className="bg-transparent border-b border-gold/20 py-3 text-cream outline-none focus:border-gold transition-colors font-light placeholder:text-cream/20 resize-none"
+                />
+              </div>
 
-          {status === "success" && (
-            <p className="text-sm text-gold" role="status">
-              Thank you — we&apos;ll be in touch shortly.
-            </p>
-          )}
-          {status === "error" && (
-            <p className="text-sm text-rose" role="alert">
-              Something went wrong. Please try again.
-            </p>
-          )}
-        </motion.form>
+              <div className="mt-4 flex flex-col items-center gap-6">
+                <motion.button
+                  ref={buttonRef}
+                  type="submit"
+                  disabled={status === "loading"}
+                  className="group relative flex items-center justify-center gap-4 w-full md:w-auto bg-gold px-16 py-6 font-sans text-[11px] font-bold uppercase tracking-[0.3em] text-mocha overflow-hidden disabled:opacity-50"
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span className="relative z-10">
+                    {status === "loading" ? "Crafting..." : "Send Request"}
+                  </span>
+                  <ArrowRight className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-1" />
+                  <motion.div 
+                    className="absolute inset-0 bg-cream"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: 0 }}
+                    transition={{ duration: 0.4, ease: "power2.out" }}
+                  />
+                </motion.button>
+
+                <AnimatePresence>
+                  {status === "success" && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-[13px] text-gold font-light tracking-wide text-center"
+                    >
+                      Bespoke request received. We&apos;ll be in touch soon.
+                    </motion.p>
+                  )}
+                  {status === "error" && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-[13px] text-rose font-light tracking-wide text-center"
+                    >
+                      Connection error. Please try again.
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
+            </form>
+          </motion.div>
+          {/* Decorative Background Element */}
+          <div className="absolute -z-10 -right-20 -top-20 w-64 h-64 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -z-10 -left-20 -bottom-20 w-64 h-64 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
+        </div>
       </div>
     </section>
+  );
+}
+
+function ContactLink({ icon, label, href, value }: { icon: React.ReactNode; label: string; href: string; value: string }) {
+  return (
+    <Link href={href} className="group flex items-center gap-6 no-underline">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-gold/20 text-gold transition-colors group-hover:bg-gold group-hover:text-mocha">
+        {icon}
+      </div>
+      <div>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-gold/50 mb-1">{label}</p>
+        <p className="font-serif text-xl md:text-2xl text-cream transition-colors group-hover:text-gold">{value}</p>
+      </div>
+    </Link>
+  );
+}
+
+function ContactItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-6">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-gold/20 text-gold">
+        {icon}
+      </div>
+      <div>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-gold/50 mb-1">{label}</p>
+        <p className="font-serif text-xl md:text-2xl text-cream">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function FloatingInput({ id, label, value, onChange, type = "text", required = false, placeholder = "" }: any) {
+  return (
+    <div className="flex flex-col gap-2">
+      <label htmlFor={id} className="text-[10px] font-bold uppercase tracking-widest text-gold/60">
+        {label}
+      </label>
+      <input
+        id={id}
+        type={type}
+        value={value}
+        onChange={onChange}
+        required={required}
+        placeholder={placeholder}
+        className="bg-transparent border-b border-gold/20 py-3 text-cream outline-none focus:border-gold transition-colors font-light placeholder:text-cream/20"
+      />
+    </div>
   );
 }
