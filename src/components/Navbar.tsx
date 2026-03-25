@@ -30,10 +30,10 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          "fixed left-0 right-0 top-0 z-110 flex items-center justify-between px-6 md:px-12 lg:px-[60px] transition-all duration-700",
+          "fixed left-0 right-0 top-0 z-110 flex items-center justify-between pr-6 md:px-12 lg:px-[60px] transition-all duration-700",
           scrolled && !isMobileMenuOpen
             ? "bg-[#FEFAF6]/90 backdrop-blur-[16px] border-b border-[#D4AF37]/20 shadow-lg shadow-black/5 py-4" 
-            : "bg-transparent border-b border-transparent py-8 pointer-events-auto"
+            : "bg-transparent border-b border-transparent py-2 pointer-events-auto"
         )}
       >
         {/* Left Logo */}
