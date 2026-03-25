@@ -265,7 +265,7 @@ export function Contact() {
                     className="absolute inset-0 bg-cream"
                     initial={{ x: "-100%" }}
                     whileHover={{ x: 0 }}
-                    transition={{ duration: 0.4, ease: "power2.out" }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
                   />
                 </motion.button>
 
