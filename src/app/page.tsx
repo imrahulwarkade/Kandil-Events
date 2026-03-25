@@ -13,7 +13,7 @@ const Gallery = dynamic(
   {
     loading: () => (
       <div
-        className="min-h-[320px] bg-cream px-[60px] py-[120px]"
+        className="min-h-[320px] bg-cream px-[60px] py-[120px] "
         aria-hidden
       />
     ),
