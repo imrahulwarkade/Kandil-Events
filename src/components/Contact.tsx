@@ -51,63 +51,70 @@ export function Contact() {
     // Refresh ScrollTrigger to account for dynamic content above (Gallery, etc.)
     const timer = setTimeout(() => ScrollTrigger.refresh(), 1000);
 
-    const ctx = gsap.context(() => {
-      // Entrance Animation
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "bottom bottom",
-          scrub: 1.5,
-          invalidateOnRefresh: true,
-        },
-      });
+    const mm = gsap.matchMedia();
 
-      // Left Column Reveal (Text titles reveal from -100% left)
-      tl.from(".contact-reveal-left", {
-        x: -200,
-        opacity: 0,
-        duration: 2,
-        stagger: 0.5,
-        ease: "power2.out",
-      });
+    mm.add("(min-width: 1024px)", () => {
+      const ctx = gsap.context(() => {
+        // Entrance Animation
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "bottom bottom",
+            scrub: 1.5,
+            invalidateOnRefresh: true,
+          },
+        });
 
-      // Right Column Reveal (Form reveals from the right)
-      tl.from(".contact-reveal-right", {
-        x: 200,
-        opacity: 0,
-        duration: 2,
-        ease: "power2.out",
-      }, "<0.5");
+        // Left Column Reveal (Text titles reveal from -100% left)
+        tl.from(".contact-reveal-left", {
+          x: -200,
+          opacity: 0,
+          duration: 2,
+          stagger: 0.5,
+          ease: "power2.out",
+        });
 
-      // Magnetic Button Effect
-      const button = buttonRef.current;
-      if (button) {
-        const onMouseMove = (e: MouseEvent) => {
-          const { clientX, clientY } = e;
-          const { left, top, width, height } = button.getBoundingClientRect();
-          const x = clientX - (left + width / 2);
-          const y = clientY - (top + height / 2);
-          gsap.to(button, {
-            x: x * 0.2,
-            y: y * 0.2,
-            duration: 0.4,
-            ease: "power2.out",
-          });
-        };
-        const onMouseLeave = () => {
-          gsap.to(button, { x: 0, y: 0, duration: 0.6, ease: "elastic.out(1, 0.3)" });
-        };
-        button.addEventListener("mousemove", onMouseMove);
-        button.addEventListener("mouseleave", onMouseLeave);
-        return () => {
-          button.removeEventListener("mousemove", onMouseMove);
-          button.removeEventListener("mouseleave", onMouseLeave);
-        };
-      }
-    }, sectionRef);
+        // Right Column Reveal (Form reveals from the right)
+        tl.from(".contact-reveal-right", {
+          x: 200,
+          opacity: 0,
+          duration: 2,
+          ease: "power2.out",
+        }, "<0.5");
 
-    return () => ctx.revert();
+        // Magnetic Button Effect
+        const button = buttonRef.current;
+        if (button) {
+          const onMouseMove = (e: MouseEvent) => {
+            const { clientX, clientY } = e;
+            const { left, top, width, height } = button.getBoundingClientRect();
+            const x = clientX - (left + width / 2);
+            const y = clientY - (top + height / 2);
+            gsap.to(button, {
+              x: x * 0.2,
+              y: y * 0.2,
+              duration: 0.4,
+              ease: "power2.out",
+            });
+          };
+          const onMouseLeave = () => {
+            gsap.to(button, { x: 0, y: 0, duration: 0.6, ease: "elastic.out(1, 0.3)" });
+          };
+          button.addEventListener("mousemove", onMouseMove);
+          button.addEventListener("mouseleave", onMouseLeave);
+          return () => {
+            button.removeEventListener("mousemove", onMouseMove);
+            button.removeEventListener("mouseleave", onMouseLeave);
+          };
+        }
+      }, sectionRef);
+    });
+
+    return () => {
+      mm.revert();
+      clearTimeout(timer);
+    };
   }, []);
 
   const update =
