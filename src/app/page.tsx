@@ -1,4 +1,8 @@
+"use client";
+
 import dynamic from "next/dynamic";
+import { useState, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 import { About } from "@/src/components/About";
 import { Contact } from "@/src/components/Contact";
 import { Cursor } from "@/src/components/Cursor";
@@ -7,6 +11,7 @@ import { Hero } from "@/src/components/Hero";
 import { Marquee } from "@/src/components/Marquee";
 import { Navbar } from "@/src/components/Navbar";
 import { Services } from "@/src/components/Services";
+import { Preloader } from "@/src/components/Preloader";
 
 const Gallery = dynamic(
   () => import("@/src/components/Gallery").then((m) => ({ default: m.Gallery })),
@@ -36,8 +41,23 @@ const Testimonials = dynamic(
 );
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Elegant minimum loading time to ensure branding is established
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2800); // 2.8s total duration
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
+      <AnimatePresence mode="wait">
+        {isLoading && <Preloader key="preloader" />}
+      </AnimatePresence>
+      
       <Cursor />
       <Navbar />
       <main>
