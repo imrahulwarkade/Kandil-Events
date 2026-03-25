@@ -40,9 +40,6 @@ export const metadata: Metadata = {
     description:
       "Bespoke event design and flawless execution for weddings, corporate galas, and cultural celebrations.",
   },
-  icons: {
-    icon: "/assets/favicon.png",
-  },
 };
 
 export default function RootLayout({
