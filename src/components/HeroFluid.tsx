@@ -92,7 +92,7 @@ const SpotlightMaterial = shaderMaterial(
       vec3 brandCream = vec3(0.996, 0.980, 0.964); 
       
       // The room is brightly flooded with Cream, muting the photo behind a luxurious milky veil
-      vec3 brightAmbiance = mix(texColor.rgb, brandCream, 0.45); // Reduced from 0.88 to 0.45 for more transparency
+      vec3 brightAmbiance = mix(texColor.rgb, brandCream, 0.75); // Increased from 0.45 to 0.75 for less transparency (more milky veil)
       
       // Illuminated Environment: The pure, brilliant photograph glowing cleanly the spotlight strikes
       vec3 litColor = texColor.rgb + (uColorGold * totalIntensity * 0.15); 

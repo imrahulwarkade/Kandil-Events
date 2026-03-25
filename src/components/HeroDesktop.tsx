@@ -18,9 +18,9 @@ export function HeroDesktop() {
         <HeroFluid />
       </div>
 
-      <div className="pointer-events-none absolute inset-0 z-1 bg-linear-to-b from-[#FEFAF6]/60 via-transparent to-[#FEFAF6]/40" />
+      <div className="pointer-events-none absolute inset-0 z-1 bg-linear-to-b from-[#FEFAF6]/85 via-transparent to-[#FEFAF6]/65" />
 
-      <div className="pointer-events-none relative z-10 flex h-full w-full flex-col items-center justify-start px-6 pt-[22vh] text-center">
+      <div className="pointer-events-none relative z-10 flex h-full w-full flex-col items-center justify-start px-6 pt-[12vh] text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -50,7 +50,7 @@ export function HeroDesktop() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.9 }}
-            className="mx-auto mb-0 max-w-xl text-sm font-light leading-[1.8] text-[#2C2A28]/80 drop-shadow-sm md:text-[17px]"
+            className="mx-auto mb-0 max-w-xl text-sm font-light leading-[1.8] text-[#2C2A28]/80 drop-shadow-sm md:text-2xl md:font-medium"
           >
             Kandil Events orchestrates bespoke celebrations — from grand weddings and
             elegant corporate galas to intimate cultural ceremonies. Every detail, a
@@ -61,7 +61,7 @@ export function HeroDesktop() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 1.1 }}
-            className="pointer-events-auto mt-4 flex w-full flex-col gap-6 sm:mt-0 sm:w-auto sm:flex-row"
+            className="pointer-events-auto md:mt-8 flex w-full flex-col gap-6 sm:mt-0 sm:w-auto sm:flex-row"
           >
             <button
               type="button"

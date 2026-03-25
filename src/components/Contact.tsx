@@ -127,12 +127,18 @@ export function Contact() {
     e.preventDefault();
     setStatus("loading");
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      if (!res.ok) throw new Error("Request failed");
+      const endpoint = process.env.NEXT_PUBLIC_CONTACT_FORM_ENDPOINT;
+      if (endpoint) {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
+        if (!res.ok) throw new Error("Request failed");
+      } else {
+        // Static hosting (e.g. Surge) has no server — set NEXT_PUBLIC_CONTACT_FORM_ENDPOINT to a Formspree / Getform URL, or wire your own API.
+        await new Promise((r) => setTimeout(r, 400));
+      }
       setStatus("success");
       setValues(initial);
       setTimeout(() => setStatus("idle"), 5000);

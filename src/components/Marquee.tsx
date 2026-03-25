@@ -66,7 +66,7 @@ export function Marquee() {
   }
 
   return (
-    <section className="relative w-full bg-gold-light/5 hidden md:block">
+    <section className="relative w-full bg-gold-light/5 hidden md:block overflow-hidden">
       {/* Rotated Container */}
       <div className="relative scale-110 origin-center py-20 flex flex-col gap-1 items-center">
         {/* Top Row - Faded/Ghost */}
