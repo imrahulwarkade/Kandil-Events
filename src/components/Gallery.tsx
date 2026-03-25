@@ -9,7 +9,7 @@ export function Gallery() {
   return (
     <section
       id="gallery"
-      className="bg-mocha px-[5%] py-20 md:px-[7%] lg:py-32"
+      className="bg-mocha py-20 md:px-[7%] lg:py-32"
       aria-labelledby="gallery-heading"
     >
       <GalleryIntro />

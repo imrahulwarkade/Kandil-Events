@@ -60,26 +60,26 @@ export function Testimonials() {
               range={[i * 0.25, 1]}
               targetScale={targetScale}
             >
-              <div className="flex h-full flex-col justify-between">
+              <div className="flex h-full flex-col justify-between gap-6">
                 <div className="flex flex-col gap-4 md:gap-6">
                   <div className="flex items-center gap-4">
-                    <span className="h-px w-12 bg-gold/50" />
-                    <div className="flex text-gold text-lg" aria-label={`${t.stars} out of 5 stars`}>
+                    <span className="h-px w-8 md:w-12 bg-gold/50" />
+                    <div className="flex text-gold text-base md:text-lg" aria-label={`${t.stars} out of 5 stars`}>
                       {"★".repeat(t.stars)}
                     </div>
                   </div>
-                  <p className="font-serif text-[22px] md:text-[32px] lg:text-[42px] font-light italic leading-tight text-cream">
+                  <p className="font-serif text-[18px] sm:text-[22px] md:text-[32px] lg:text-[42px] font-light italic leading-relaxed md:leading-tight text-cream">
                     &ldquo;{t.quote}&rdquo;
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between border-t border-cream/10 pt-6 md:pt-10">
+                <div className="flex items-center justify-between border-t border-cream/10 pt-4 md:pt-10 mt-auto">
                   <div className="flex items-center gap-4 md:gap-6">
-                    <div className="flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-full bg-linear-to-br from-gold/20 to-gold/40 font-serif text-xl md:text-2xl text-gold backdrop-blur-md border border-gold/30">
+                    <div className="flex shrink-0 h-10 w-10 md:h-16 md:w-16 items-center justify-center rounded-full bg-linear-to-br from-gold/20 to-gold/40 font-serif text-lg md:text-2xl text-gold backdrop-blur-md border border-gold/30">
                       {t.authorInitial}
                     </div>
                     <div>
-                      <h4 className="font-serif text-lg md:text-2xl font-light text-cream tracking-wide">
+                      <h4 className="font-serif text-base md:text-2xl font-light text-cream tracking-wide">
                         {t.authorName}
                       </h4>
                       <p className="mt-1 text-[9px] md:text-[11px] font-bold uppercase tracking-[0.3em] text-gold">

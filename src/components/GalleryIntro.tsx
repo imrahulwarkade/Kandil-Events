@@ -5,7 +5,7 @@ import { SectionLabel } from "@/src/components/SectionLabel";
  */
 export function GalleryIntro() {
   return (
-    <div className="mb-16 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+    <div className="px-[5%] mb-16 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
       <div className="max-w-xl text-cream">
         <SectionLabel className="mb-6 border-cream/20 text-cream">Portfolio</SectionLabel>
         <h2

@@ -29,14 +29,14 @@ export const StickyCard_001 = ({
   return (
     <div
       ref={container}
-      className="sticky top-0 flex h-screen items-center justify-center pt-20"
+      className="sticky top-0 flex h-screen items-center justify-center pt-10 md:pt-20"
     >
       <motion.div
         style={{
           scale,
-          top: `calc(-5vh + ${i * 40}px)`,
+          top: `calc(-5vh + ${i * 30}px)`,
         }}
-        className="relative h-70 md:h-112.5 w-full max-w-250 overflow-hidden rounded-3xl bg-mocha shadow-2xl"
+        className="relative min-h-[26rem] h-auto sm:h-auto md:h-124 w-full max-w-[1000px] overflow-hidden rounded-3xl bg-mocha shadow-2xl flex flex-col"
       >
         <div className="absolute inset-0 h-full w-full">
           <Image
@@ -48,7 +48,7 @@ export const StickyCard_001 = ({
           <div className="absolute inset-0 bg-linear-to-b from-dark/20 via-dark/80 to-dark" />
         </div>
         
-        <div className="relative h-full w-full px-8 py-10 md:px-16 md:py-16">
+        <div className="relative h-full w-full px-6 py-8 sm:px-10 sm:py-12 md:px-16 md:py-16 flex-1 flex flex-col">
           {children}
         </div>
       </motion.div>

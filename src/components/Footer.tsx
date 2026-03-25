@@ -109,9 +109,9 @@ export function Footer() {
               <Image
                 src="/assets/logo-transparent.png"
                 alt="Kandil Events"
-                width={180}
-                height={120}
-                className="h-auto w-40 brightness-125 transition-transform hover:scale-105 duration-500"
+                width={280}
+                height={160}
+                className="h-auto w-64 brightness-125 transition-transform hover:scale-105 duration-500"
               />
             </Link>
             <p className="font-serif text-xl leading-relaxed text-cream/70 italic">
