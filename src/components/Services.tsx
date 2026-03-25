@@ -40,7 +40,7 @@ function ServiceCard({ service }: { service: Service }) {
         {/* Circular Arrow Button */}
         <Link
           href="/#contact"
-          className="absolute bottom-10 right-8 flex h-12 w-12 items-center justify-center rounded-full bg-[#0a4d3f] text-white transition-transform hover:scale-110"
+          className="absolute md:bottom-10 bottom-4 right-8 flex h-12 w-12 items-center justify-center rounded-full bg-[#0a4d3f] text-white transition-transform hover:scale-110"
         >
           <span className="text-xl -rotate-45">→</span>
         </Link>
@@ -138,7 +138,7 @@ export function Services() {
         </div>
 
         {/* Mobile Vertical Stack */}
-        <div className="flex flex-col gap-8 px-4 lg:hidden">
+        <div className="flex flex-col gap-8  lg:hidden">
           {services.map((service) => (
             <div key={service.num} className="service-card-mobile">
               <ServiceCard service={service} />
