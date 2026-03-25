@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "deploy:surge": "next build && surge ./out"
+    "deploy:surge": "next build && surge ./out kandil-events-warkade.surge.sh"
   },
   "dependencies": {
     "@number-flow/react": "^0.6.0",
