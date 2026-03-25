@@ -1,189 +1,162 @@
 "use client";
 
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { SectionLabel } from "@/src/components/SectionLabel";
-import { galleryFilters, galleryItems } from "@/src/lib/data";
+import { galleryItems } from "@/src/lib/data";
 import { cn } from "@/src/lib/utils";
-import type { LocationId } from "@/src/types";
 
-type FilterId = "all" | LocationId;
-
-const viewport = { once: true, amount: 0.12 as const };
+const springConfig = { type: "spring", stiffness: 300, damping: 35 };
 
 export function Gallery() {
-  const [activeFilter, setActiveFilter] = useState<FilterId>("all");
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const visibleItems = galleryItems.filter((item) => {
-    const passesFilter =
-      activeFilter === "all" || item.location === activeFilter;
-    const passesExpand = !item.extra || isExpanded;
-    return passesFilter && passesExpand;
-  });
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
 
   return (
     <section
       id="gallery"
-      className="px-[60px] py-[120px]"
+      className="bg-mocha px-[5%] py-20 md:px-[7%] lg:py-32"
       aria-labelledby="gallery-heading"
     >
-      <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={viewport}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <SectionLabel>Past Moments</SectionLabel>
-          </motion.div>
-          <motion.h2
+      <div className="mb-16 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+        <div className="max-w-xl text-cream">
+          <SectionLabel className="mb-6 border-cream/20 text-cream">Portfolio</SectionLabel>
+          <h2
             id="gallery-heading"
-            className="font-serif text-[clamp(42px,5vw,68px)] font-light leading-[1.1] text-mocha"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={viewport}
-            transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+            className="font-serif text-[clamp(42px,6vw,84px)] font-bold leading-none"
           >
-            Our <em className="italic text-rose">Gallery</em>
-          </motion.h2>
+            Curated <em className="italic text-gold">Experiences</em>
+          </h2>
         </div>
-        <motion.button
-          type="button"
-          className="inline-flex items-center gap-2 border-0 bg-transparent p-0 text-[11px] font-light uppercase tracking-[0.2em] text-mocha focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
-          onClick={() => setIsExpanded((e) => !e)}
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={viewport}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          whileHover={{ x: 4 }}
-          aria-expanded={isExpanded}
-        >
-          {isExpanded ? "Show Less" : "View Full Portfolio"}
-        </motion.button>
+        <div className="max-w-xs text-right md:block hidden">
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold mb-2">
+            Selected Work
+          </p>
+          <p className="text-[11px] font-light leading-relaxed text-cream/50 uppercase tracking-widest">
+            A journey through our most <br /> distinguished celebrations.
+          </p>
+        </div>
       </div>
 
-      <motion.div
-        className="mb-12 flex gap-8 overflow-x-auto border-b border-gold/20 pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={viewport}
-        transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-        role="tablist"
-        aria-label="Filter by venue"
-      >
-        {galleryFilters.map((f) => (
-          <motion.button
-            key={f.id}
-            type="button"
-            role="tab"
-            aria-selected={activeFilter === f.id}
+      {/* Desktop Accordion */}
+      <div className="hidden h-175 w-full gap-1 md:flex">
+        {galleryItems.map((item, index) => (
+          <motion.div
+            key={item.id}
+            layout
+            onMouseEnter={() => setExpandedIndex(index)}
             className={cn(
-              "relative whitespace-nowrap border-0 bg-transparent pb-2 font-sans text-[11px] font-light uppercase tracking-[0.2em] transition-opacity duration-300",
-              activeFilter === f.id
-                ? "text-gold opacity-100"
-                : "text-mocha opacity-40",
+              "relative cursor-pointer overflow-hidden bg-cream/5 transition-all duration-500",
+              expandedIndex === index ? "flex-[5]" : "flex-1"
             )}
-            onClick={() => setActiveFilter(f.id)}
-            whileHover={{ opacity: 1 }}
+            transition={springConfig}
           >
-            {f.label}
-            <motion.span
-              className="absolute bottom-0 left-0 h-px bg-gold"
-              initial={false}
-              animate={{
-                width: activeFilter === f.id ? "100%" : "0%",
-              }}
-              transition={{ duration: 0.3 }}
-            />
-          </motion.button>
-        ))}
-      </motion.div>
-
-      <motion.div
-        className={cn(
-          "grid gap-5 transition-all duration-300 ease-in-out",
-          isExpanded
-            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-            : "grid-cols-1 md:grid-cols-[2fr_1fr_1fr] md:grid-rows-[300px_280px]",
-        )}
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={viewport}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-      >
-        <AnimatePresence mode="popLayout">
-          {visibleItems.map((item, index) => (
-            <motion.div
-              key={item.id}
-              layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className={cn(
-                "relative min-h-[280px] overflow-hidden",
-                !isExpanded &&
-                  index === 0 &&
-                  visibleItems.length > 0 &&
-                  "md:row-span-2",
-                !isExpanded &&
-                  index === 0 &&
-                  visibleItems.length === 1 &&
-                  "md:col-span-full",
-              )}
-            >
-              <GalleryTile item={item} />
+            {/* Background Image Container */}
+            <motion.div className="absolute inset-0 h-full w-full" layout>
+              <Image
+                src={item.imageSrc}
+                alt={item.title}
+                fill
+                className={cn(
+                  "object-cover transition-all duration-1000",
+                  expandedIndex === index ? "opacity-100 scale-100 blur-0" : "opacity-30 scale-110 blur-sm brightness-50"
+                )}
+                sizes="(max-width: 1200px) 80vw, 50vw"
+              />
+              <div className={cn(
+                "absolute inset-0 transition-opacity duration-700",
+                expandedIndex === index 
+                  ? "bg-linear-to-t from-mocha via-transparent to-transparent opacity-80" 
+                  : "bg-mocha/40 opacity-100"
+              )} />
             </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
-    </section>
-  );
-}
 
-function GalleryTile({
-  item,
-}: {
-  item: (typeof galleryItems)[number];
-}) {
-  return (
-    <motion.div
-      className="group relative h-full min-h-[280px] w-full overflow-hidden"
-      whileHover="hover"
-      initial="rest"
-      variants={{ rest: {}, hover: {} }}
-    >
-      <motion.div
-        className="relative h-full w-full"
-        variants={{
-          rest: { scale: 1 },
-          hover: { scale: 1.04 },
-        }}
-        transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-      >
-        <Image
-          src={item.imageSrc}
-          alt={item.title}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 33vw"
-        />
-      </motion.div>
-      <motion.div
-        className="absolute inset-0 flex items-end bg-gradient-to-t from-[rgba(42,26,24,0.7)] to-transparent p-8"
-        variants={{
-          rest: { opacity: 0 },
-          hover: { opacity: 1 },
-        }}
-        transition={{ duration: 0.4 }}
-      >
-        <p className="font-serif text-[22px] font-light text-cream">
-          {item.title}
-        </p>
-      </motion.div>
-    </motion.div>
+            {/* Vertical Label (Collapsed State) */}
+            <AnimatePresence>
+              {expandedIndex !== index && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 flex items-center justify-center p-4"
+                >
+                  <p className="whitespace-nowrap font-sans text-[12px] font-bold tracking-[0.4em] text-cream/40 uppercase [writing-mode:vertical-rl] rotate-180">
+                    {item.title}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Expanded Content (Active State) */}
+            <AnimatePresence>
+              {expandedIndex === index && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                  transition={{ delay: 0.1, duration: 0.5 }}
+                  className="absolute inset-0 flex flex-col justify-end p-12 lg:p-16"
+                >
+                  <div className="flex flex-col gap-8">
+                    <div className="flex items-center gap-6">
+                      <span className="h-px w-20 bg-gold/50" />
+                      <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-gold">
+                        {item.location}
+                      </span>
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="max-w-xl font-serif text-[42px] font-bold leading-tight text-cream lg:text-[54px]">
+                        {item.title.split("@").join("\n@")}
+                      </h3>
+                      <p className="max-w-md text-[13px] font-light leading-relaxed tracking-wider text-cream/70">
+                        Seamlessly weaving together tradition and contemporary luxury to create a truly unforgettable atmosphere for our distinguished guests.
+                      </p>
+                    </div>
+                    <motion.div 
+                      className="group flex w-fit items-center gap-4 text-[11px] font-bold uppercase tracking-[0.2em] text-gold"
+                      whileHover={{ x: 10 }}
+                    >
+                      View Project Details
+                      <span className="h-px w-8 bg-gold transition-all group-hover:w-16" />
+                    </motion.div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Mobile Stack */}
+      <div className="flex flex-col gap-6 md:hidden">
+        {galleryItems.slice(0, 5).map((item) => (
+          <motion.div 
+            key={item.id} 
+            className="relative h-[300px] w-full overflow-hidden rounded-lg bg-mocha/5"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Image
+              src={item.imageSrc}
+              alt={item.title}
+              fill
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-black/90 via-transparent to-transparent flex flex-col justify-end p-8">
+              <span className="mb-2 text-[9px] font-bold uppercase tracking-[0.3em] text-gold">
+                {item.location}
+              </span>
+              <p className="font-serif text-[24px] font-light text-cream leading-tight">
+                {item.title}
+              </p>
+            </div>
+          </motion.div>
+        ))}
+        <button className="mt-4 w-full border border-cream/10 py-5 font-sans text-[11px] font-bold uppercase tracking-[0.3em] text-cream/70 hover:bg-cream hover:text-dark transition-colors">
+          View All Portfolio
+        </button>
+      </div>
+    </section>
   );
 }
